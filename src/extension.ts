@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { getUri } from './utils/getUri';
 import { getNonce } from './utils/getNonce';
+import { getFileUri } from './utils/getFileUri';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -32,9 +33,13 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 			);
 			
-			const iconPath = getUri(panel.webview, context.extensionUri, ["webview", "build", "logo192.png"]);
+			const lightIconPath = getFileUri(panel.webview, context.extensionPath, ["media", "icon-light.svg"]);
+			const darkIconPath = getFileUri(panel.webview, context.extensionPath, ["media", "icon-dark.svg"]);
 			
-			panel.iconPath = iconPath;
+			panel.iconPath = {
+				light: lightIconPath,
+				dark: darkIconPath
+			};
 
 			const stylesUri = getUri(panel.webview, context.extensionUri, [
 				"webview",
