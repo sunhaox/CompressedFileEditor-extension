@@ -14,10 +14,28 @@
   "contributes": {
     "commands": [
       {
-        "command": "compressed-file-editor.helloWorld",
-        "title": "Hello World"
+        "command": "compressed-file-editor.openFile",
+        "title": "Dump Compressed File",
+        "icon":{
+          "light": "./media/icon-light.svg",
+          "dark": "./media/icon-dark.svg"
+        }
       }
-    ]
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "when": "activeEditor",
+          "command": "compressed-file-editor.openFile",
+          "group": "navigation@1"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "compressed-file-editor.openFile"
+        }
+      ]
+    }
   },
   "scripts": {
     "install_webview": "cd webview && npm install",
