@@ -20,6 +20,10 @@
     ]
   },
   "scripts": {
+    "install_webview": "cd webview && npm install",
+    "install_all": "npm install && npm run install_webview",
+    "build_webview": "cd webview && npm run build",
+    "build_all": "npm run compile && npm run build_webview",
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
