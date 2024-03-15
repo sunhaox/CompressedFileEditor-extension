@@ -6,7 +6,8 @@ import { getNonce } from './utils/getNonce';
 import { getFileUri } from './utils/getFileUri';
 import {
 	COMMAND, 
-	Message
+	Message,
+	MessageFromExtension
 } from "./model/message.model";
 
 // This method is called when your extension is activated
@@ -17,10 +18,12 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "compressed-file-editor" is now active!');
 
+	let _panel:vscode.WebviewPanel|undefined;
+
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('compressed-file-editor.openFile', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('compressed-file-editor.openFile', () => {
 		// Create HTML
         const panel = vscode.window.createWebviewPanel(
 			'compressedFileEditor',
@@ -70,7 +73,7 @@ export function activate(context: vscode.ExtensionContext) {
 					<meta charset="utf-8">
 					<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
 					<meta name="theme-color" content="#000000">
-					<meta http-equiv="Content-Security-Policy" content="default-src 'self' ; style-src ${panel.webview.cspSource}; script-src 'nonce-${nonce}';">
+					<meta http-equiv="Content-Security-Policy" content="default-src 'self' ; style-src 'unsafe-inline' ${panel.webview.cspSource}; script-src 'nonce-${nonce}';">
 	
 					<link rel="stylesheet" type="text/css" href="${stylesUri}">
 					<title>Hello World</title>
@@ -88,7 +91,7 @@ export function activate(context: vscode.ExtensionContext) {
 				const command = message.command;
 
 				switch (command) {
-					case COMMAND.testMessage:
+					case COMMAND.testMessageFromWebview:
 						vscode.window.showInformationMessage(message.data.message);
 						return;
 				}
@@ -96,9 +99,20 @@ export function activate(context: vscode.ExtensionContext) {
 			undefined
 		);
 
-	});
+		_panel = panel;
 
-	context.subscriptions.push(disposable);
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('compressed-file-editor.sendMessage', () => {
+		const messageFromExtension: MessageFromExtension = {
+			command: COMMAND.testMessageFromExtension,
+			data: {
+				message: "Message From Extension"
+			}
+		};
+		_panel?.webview.postMessage(messageFromExtension);
+	}));
+
 }
 
 // This method is called when your extension is deactivated

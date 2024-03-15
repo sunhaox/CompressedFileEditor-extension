@@ -20,6 +20,10 @@
           "light": "./media/icon-light.svg",
           "dark": "./media/icon-dark.svg"
         }
+      },
+      {
+        "command": "compressed-file-editor.sendMessage",
+        "title": "Send Message To webview"
       }
     ],
     "menus": {
