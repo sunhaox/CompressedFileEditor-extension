@@ -1,6 +1,7 @@
 export enum COMMAND {
   testMessageFromWebview = 'TEST_MESSAGE',
-  testMessageFromExtension = 'TEST_MESSAGE'
+  testMessageFromExtension = 'TEST_MESSAGE',
+  hexStringMessage = "HEX_STRING_MESSAGE"
 }
 
 export type Message = {
@@ -23,4 +24,11 @@ export type MessageFromExtension = Message & {
     message: string;
   }
 };
-  
+
+// extends Message
+export type MessageHexString = Message & {
+  command: COMMAND.hexStringMessage;
+  data: {
+    message: string[][];
+  }
+};
