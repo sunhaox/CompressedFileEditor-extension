@@ -9,7 +9,8 @@ import {
 	COMMAND, 
 	Message,
 	MessageFromExtension,
-	MessageHexString
+	MessageHexString,
+	MessageJsonString
 } from "./model/message.model";
 
 // This method is called when your extension is activated
@@ -58,14 +59,29 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		}
 		
-		const message: MessageHexString = {
+		const hexMessage: MessageHexString = {
 			command: COMMAND.hexStringMessage,
 			data: {
 				message: hexArray
 			}
 		};
 
-		_panel.webview.postMessage(message);
+		_panel.webview.postMessage(hexMessage);
+
+		const jsonString = await openJson(filePath);
+
+		if(jsonString === undefined) {
+			return;
+		} 
+
+		const jsonMessage: MessageJsonString = {
+			command: COMMAND.jsonStringMessage,
+			data: {
+				message: jsonString
+			}
+		};
+
+		_panel.webview.postMessage(jsonMessage);
 
 	}));
 
@@ -174,4 +190,22 @@ async function openFile(filePath: string): Promise<Buffer> {
 			}
 		});
 	});
+}
+
+async function openJson(filePath: string) {
+	filePath = filePath + '_compressed.json';
+
+	let doc:vscode.TextDocument|undefined;
+	try {
+		doc = await vscode.workspace.openTextDocument(filePath);
+	}
+	catch(error) {
+		vscode.window.showErrorMessage((error as Error).message);
+	}
+
+	if(!doc) {
+		return undefined;
+	}
+
+	return doc.getText();
 }

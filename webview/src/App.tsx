@@ -13,7 +13,8 @@ import {
 import HexDump from './components/HexDump'
 
 interface State {
-  hex_data: string[][];
+  hex_data: string[][], 
+  json_object: {};
 }
 
 class App extends Component<{}, State> {
@@ -24,23 +25,22 @@ class App extends Component<{}, State> {
     this.state = {
       hex_data: [['12', '33', '11', '32', '23', '03', '33', '12', '12', '33', '11', '32', '23', '03', '33', '12'],
                 ['12', '33', '11', '32', '23', '03', '33', '12', '12', '33', '11', '32', '23', '03', '33', '12'],
-                ['12', '33', '11', '32', '23', '03', '33', '12', '12', '33', '11']]
+                ['12', '33', '11', '32', '23', '03', '33', '12', '12', '33', '11']],
+      json_object: {
+        "key": "value",
+        "number": 123,
+        "obj": {
+          'string': "1233",
+          'number': 1233,
+          'bool': true
+        }
+      }
     };
 
     this.handleMessage = this.handleMessage.bind(this);
     this.handleBtnClick = this.handleBtnClick.bind(this);
 
     window.addEventListener('message', this.handleMessage);
-
-    this.my_json_object = {
-      "key": "value",
-      "number": 123,
-      "obj": {
-        'string': "1233",
-        'number': 1233,
-        'bool': true
-      }
-    }
   }
 
   render() {
@@ -50,7 +50,7 @@ class App extends Component<{}, State> {
           <HexDump hexData={this.state.hex_data}></HexDump>
         </div>
         <div className='App-frame'>
-          <ReactJson src={this.my_json_object} />
+          <ReactJson src={this.state.json_object} />
         </div>
         <div className='App-frame'>
           <Button onClick={this.handleBtnClick}>Click</Button>
@@ -74,6 +74,10 @@ class App extends Component<{}, State> {
         return;
       case COMMAND.hexStringMessage:
         this.setState({hex_data: message.data.message});
+        return;
+      case COMMAND.jsonStringMessage:
+        this.setState({json_object: JSON.parse(message.data.message)});
+        return;
     }
   }
 }
