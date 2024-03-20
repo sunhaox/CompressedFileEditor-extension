@@ -1,0 +1,14 @@
+.JsonEditor {
+    font-family: Consolas, 'Courier New', monospace;
+    cursor: default;
+}
+
+.JsonEditor-header {
+    text-align: right;
+    margin-top: 9px;
+}
+
+.JsonEditor-body {
+    height: calc(100vh - 40px);
+    overflow: scroll;
+}

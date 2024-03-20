@@ -111,7 +111,8 @@ function createWebview(context: vscode.ExtensionContext) {
 			enableScripts: true,
 			localResourceRoots: [
 				vscode.Uri.joinPath(context.extensionUri, "out"),
-				vscode.Uri.joinPath(context.extensionUri, "webview/build")
+				vscode.Uri.joinPath(context.extensionUri, "webview/build"),
+				vscode.Uri.joinPath(context.extensionUri, "media")
 			],
 			retainContextWhenHidden: true
 		}
@@ -142,6 +143,7 @@ function createWebview(context: vscode.ExtensionContext) {
 	]);
 
 	const nonce = getNonce();
+	const codiconsUri = getUri(panel.webview, context.extensionUri, ['media', 'codicon.css']);
 	
 	panel.webview.html=/*html*/ `
 		<!DOCTYPE html>
@@ -150,9 +152,10 @@ function createWebview(context: vscode.ExtensionContext) {
 				<meta charset="utf-8">
 				<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
 				<meta name="theme-color" content="#000000">
-				<meta http-equiv="Content-Security-Policy" content="default-src 'self' ; style-src 'unsafe-inline' ${panel.webview.cspSource}; script-src 'nonce-${nonce}' ${panel.webview.cspSource};">
+				<meta http-equiv="Content-Security-Policy" content="default-src 'self' ${panel.webview.cspSource}; font-src ${panel.webview.cspSource} 'unsafe-inline'; style-src 'unsafe-inline' ${panel.webview.cspSource}; script-src 'nonce-${nonce}' ${panel.webview.cspSource}; img-src data:;">
 
 				<link rel="stylesheet" type="text/css" href="${stylesUri}">
+				<link rel="stylesheet" type="text/css" href="${codiconsUri}">
 				<title>Hello World</title>
 			</head>
 			<body>

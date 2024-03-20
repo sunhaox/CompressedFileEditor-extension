@@ -1,31 +1,25 @@
 import React, { Component } from 'react';
 import './App.css';
-import { vscode } from './utils/vscode';
 import {
-  Button
-} from 'antd'
-import ReactJson from '@microlink/react-json-view'
-import { 
-  MessageFromWebview, 
   Message,
   COMMAND 
 } from './model/message.model';
-import HexDump from './components/HexDump'
+import HexEditor from './components/HexEditor'
+import JsonEditor from './components/JsonEditor';
+import { TreeDataNode } from 'antd';
 
 interface State {
   hex_data: string[][], 
-  json_object: {};
+  json_object: {},
+  json_data: TreeDataNode[]
 }
 
 class App extends Component<{}, State> {
-  my_json_object = {};
 
   constructor(props: {}) {
     super(props);
     this.state = {
-      hex_data: [['12', '33', '11', '32', '23', '03', '33', '12', '12', '33', '11', '32', '23', '03', '33', '12'],
-                ['12', '33', '11', '32', '23', '03', '33', '12', '12', '33', '11', '32', '23', '03', '33', '12'],
-                ['12', '33', '11', '32', '23', '03', '33', '12', '12', '33', '11']],
+      hex_data: Array(100).fill(['12', '33', '11', '32', '23', '03', '33', '12', '12', '33', '11', '32', '23', '03', '33', '12']),
       json_object: {
         "key": "value",
         "number": 123,
@@ -34,11 +28,36 @@ class App extends Component<{}, State> {
           'number': 1233,
           'bool': true
         }
-      }
+      },
+      json_data: [
+        {
+          title: 'parent 1',
+          key: '0-0',
+          children: [
+            {
+              title: 'parent 1-0',
+              key: '0-0-0',
+              children: [
+                {
+                  title: 'leaf',
+                  key: '0-0-0-0',
+                },
+                {
+                  title: 'leaf1',
+                  key: '0-0-0-1',
+                },
+              ],
+            },
+            {
+              title: "123",
+              key: '0-0-1',
+            },
+          ],
+        },
+      ]
     };
 
     this.handleMessage = this.handleMessage.bind(this);
-    this.handleBtnClick = this.handleBtnClick.bind(this);
 
     window.addEventListener('message', this.handleMessage);
   }
@@ -47,24 +66,13 @@ class App extends Component<{}, State> {
     return (
       <div className="App">
         <div className='App-frame'>
-          <HexDump hexData={this.state.hex_data}></HexDump>
+          <HexEditor hexData={this.state.hex_data}></HexEditor>
         </div>
         <div className='App-frame'>
-          <ReactJson src={this.state.json_object} />
-        </div>
-        <div className='App-frame'>
-          <Button onClick={this.handleBtnClick}>Click</Button>
+          <JsonEditor json_data={this.state.json_data}></JsonEditor>
         </div>
       </div>
     );
-  }
-
-  handleBtnClick() {
-    
-    let new_data = [['12', '33', '11', '32', '23', '03', '33', '12', '12', '33', '11', '32', '23', '03', '33', '12'],
-                     ['11', '32', '23', '03', '33', '12', 'ab', '12', '12', '33', '11', '32', '23', '03', '33', '12'],
-                     ['12', '33', '11', '32', '23', '03', '33', '12', '12', '33', '11']];
-    this.setState({hex_data: new_data});
   }
 
   handleMessage(event: MessageEvent) {
@@ -77,8 +85,38 @@ class App extends Component<{}, State> {
         return;
       case COMMAND.jsonStringMessage:
         this.setState({json_object: JSON.parse(message.data.message)});
+        this.setState({json_data: this.convertJsonToTreeNode(JSON.parse(message.data.message))});
         return;
     }
+  }
+
+  convertJsonToTreeNode(json_object: {[key: string]: any}, index="0") {
+    let root: TreeDataNode[] = [];
+    let i = 0;
+    for(const key in json_object) {
+      if(typeof json_object[key] === 'string') {
+        root.push({
+          title: <span>"{key}" : <span style={{color: "rgb(203, 75, 22)"}}>"{json_object[key]}"</span></span>,
+          key: index + "-" + i.toString() + key
+        })
+      }
+      else if (typeof json_object[key] === 'number') {
+        root.push({
+          title: <span>"{key}" : <span style={{color: "rgb(38, 139, 210)"}}>{json_object[key]}</span></span>,
+          key: index + "-" + i.toString() + key
+        })
+      }
+      else if (typeof json_object[key] === 'object') {
+        let children = this.convertJsonToTreeNode(json_object[key], index + "-" + i.toString());
+        root.push({
+          title: <span>"{key}" :</span>,
+          key: index + "-" + i.toString() + key,
+          children: children
+        })
+      }
+      i++;
+    }
+    return root;
   }
 }
 

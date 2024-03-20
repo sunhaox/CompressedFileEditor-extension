@@ -1,0 +1,31 @@
+.HexEditor {
+    font-family: Consolas, 'Courier New', monospace;
+    text-align: left;
+    cursor: default;
+}
+
+.HexEditor div{
+    margin: 5px 0;
+}
+
+.HexEditor span {
+    padding: 5px;
+}
+
+.HexEditor-header {
+    color: #22367d;
+    font-weight: bold;
+}
+
+.HexEditor-col-header {
+    color: #237893;
+}
+
+.HexEditor-body {
+    height: calc(100vh - 40px);
+    overflow: scroll;
+}
+
+.HexEditor-body span:hover {
+    background-color: #f3f9ff;
+}

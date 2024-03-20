@@ -1,17 +1,17 @@
-import './HexDump.css';
+import './HexEditor.css';
 import { Component } from 'react';
 
 interface State {
   hexData: string[][];
 }
 
-class HexDump extends Component<State> {
+class HexEditor extends Component<State> {
 
   render() {
     return (
-      <div className='HexDump'>
-        <div className='HexDump-header'>
-          <span className='HexDump-col-header'>00000000</span>
+      <div className='HexEditor'>
+        <div className='HexEditor-header'>
+          <span className='HexEditor-col-header'>00000000</span>
           <span>00</span>
           <span>01</span>
           <span>02</span>
@@ -29,10 +29,11 @@ class HexDump extends Component<State> {
           <span>0E</span>
           <span>0F</span>
         </div>
+        <div className='HexEditor-body'>
         {
           this.props.hexData.map((hexArray, index) => (
             <div>
-              <span className='HexDump-col-header'>{(16 * index).toString(16).padStart(8, '0')}</span>
+              <span className='HexEditor-col-header'>{(16 * index).toString(16).padStart(8, '0')}</span>
               {
                 hexArray.map(hex => (
                   <span>{hex}</span>
@@ -41,9 +42,10 @@ class HexDump extends Component<State> {
             </div>
           ))
         }
+        </div>
       </div>
     );
   }
 }
 
-export default HexDump;
+export default HexEditor;
