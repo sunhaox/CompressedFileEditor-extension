@@ -9,8 +9,7 @@ import JsonEditor from './components/JsonEditor';
 import { TreeDataNode } from 'antd';
 
 interface State {
-  hex_data: string[][], 
-  json_object: {},
+  hex_data: string[][],
   json_data: TreeDataNode[]
 }
 
@@ -20,15 +19,6 @@ class App extends Component<{}, State> {
     super(props);
     this.state = {
       hex_data: Array(100).fill(['12', '33', '11', '32', '23', '03', '33', '12', '12', '33', '11', '32', '23', '03', '33', '12']),
-      json_object: {
-        "key": "value",
-        "number": 123,
-        "obj": {
-          'string': "1233",
-          'number': 1233,
-          'bool': true
-        }
-      },
       json_data: [
         {
           title: 'parent 1',
@@ -84,7 +74,6 @@ class App extends Component<{}, State> {
         this.setState({hex_data: message.data.message});
         return;
       case COMMAND.jsonStringMessage:
-        this.setState({json_object: JSON.parse(message.data.message)});
         this.setState({json_data: this.convertJsonToTreeNode(JSON.parse(message.data.message))});
         return;
     }
@@ -97,20 +86,20 @@ class App extends Component<{}, State> {
       if(typeof json_object[key] === 'string') {
         root.push({
           title: <span>"{key}" : <span style={{color: "rgb(203, 75, 22)"}}>"{json_object[key]}"</span></span>,
-          key: index + "-" + i.toString() + key
+          key: index + "-" + i.toString()
         })
       }
       else if (typeof json_object[key] === 'number') {
         root.push({
           title: <span>"{key}" : <span style={{color: "rgb(38, 139, 210)"}}>{json_object[key]}</span></span>,
-          key: index + "-" + i.toString() + key
+          key: index + "-" + i.toString()
         })
       }
       else if (typeof json_object[key] === 'object') {
         let children = this.convertJsonToTreeNode(json_object[key], index + "-" + i.toString());
         root.push({
           title: <span>"{key}" :</span>,
-          key: index + "-" + i.toString() + key,
+          key: index + "-" + i.toString(),
           children: children
         })
       }
