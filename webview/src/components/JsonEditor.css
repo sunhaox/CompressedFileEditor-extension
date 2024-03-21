@@ -5,7 +5,11 @@
 
 .JsonEditor-header {
     text-align: right;
-    margin-top: 9px;
+    margin-top: 5px;
+}
+
+.JsonEditor-header div {
+    margin-right: 9px;
 }
 
 .JsonEditor-body {

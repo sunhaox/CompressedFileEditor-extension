@@ -6,11 +6,12 @@ import {
 } from './model/message.model';
 import HexEditor from './components/HexEditor'
 import JsonEditor from './components/JsonEditor';
-import { TreeDataNode } from 'antd';
+import { Spin, TreeDataNode } from 'antd';
 
 interface State {
   hex_data: string[][],
-  json_data: TreeDataNode[]
+  json_data: TreeDataNode[],
+  loading: boolean
 }
 
 class App extends Component<{}, State> {
@@ -44,7 +45,8 @@ class App extends Component<{}, State> {
             },
           ],
         },
-      ]
+      ],
+      loading: true
     };
 
     this.handleMessage = this.handleMessage.bind(this);
@@ -54,14 +56,21 @@ class App extends Component<{}, State> {
 
   render() {
     return (
-      <div className="App">
-        <div className='App-frame'>
-          <HexEditor hexData={this.state.hex_data}></HexEditor>
+      <>
+        <div className='App-loading' style={{display: this.state.loading?"block":'none'}}>
+            <Spin tip="Loading">
+              <div className="content" />
+            </Spin>
+          </div>
+        <div className="App" style={{display: this.state.loading?"none":'flex'}}>
+          <div className='App-frame'>
+            <HexEditor hexData={this.state.hex_data}></HexEditor>
+          </div>
+          <div className='App-frame'>
+            <JsonEditor json_data={this.state.json_data}></JsonEditor>
+          </div>
         </div>
-        <div className='App-frame'>
-          <JsonEditor json_data={this.state.json_data}></JsonEditor>
-        </div>
-      </div>
+      </>
     );
   }
 
@@ -74,7 +83,10 @@ class App extends Component<{}, State> {
         this.setState({hex_data: message.data.message});
         return;
       case COMMAND.jsonStringMessage:
-        this.setState({json_data: this.convertJsonToTreeNode(JSON.parse(message.data.message))});
+        this.setState({
+          json_data: this.convertJsonToTreeNode(JSON.parse(message.data.message)), 
+          loading: false
+        });
         return;
     }
   }
