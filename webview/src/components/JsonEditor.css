@@ -4,12 +4,15 @@
 }
 
 .JsonEditor-header {
+    display: flex;
     text-align: right;
     margin-top: 5px;
+    
 }
 
 .JsonEditor-header div {
-    margin-right: 9px;
+    margin: auto;
+    padding-left: 9px;
 }
 
 .JsonEditor-body {

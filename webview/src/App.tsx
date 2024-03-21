@@ -6,11 +6,11 @@ import {
 } from './model/message.model';
 import HexEditor from './components/HexEditor'
 import JsonEditor from './components/JsonEditor';
-import { Spin, TreeDataNode } from 'antd';
+import { Spin } from 'antd';
 
 interface State {
   hex_data: string[][],
-  json_data: TreeDataNode[],
+  json_obj: {},
   loading: boolean
 }
 
@@ -20,32 +20,27 @@ class App extends Component<{}, State> {
     super(props);
     this.state = {
       hex_data: Array(100).fill(['12', '33', '11', '32', '23', '03', '33', '12', '12', '33', '11', '32', '23', '03', '33', '12']),
-      json_data: [
-        {
-          title: 'parent 1',
-          key: '0-0',
-          children: [
+      json_obj: {
+        "GZIP_FORMAT": {
+          "GZIP_HEADER": {
+            "ID1": {
+              "bit_size": 8,
+              "value": 31,
+              "description": "fixed value"
+            }
+          },
+          "DEFLATE_BLOCK": [
             {
-              title: 'parent 1-0',
-              key: '0-0-0',
-              children: [
-                {
-                  title: 'leaf',
-                  key: '0-0-0-0',
-                },
-                {
-                  title: 'leaf1',
-                  key: '0-0-0-1',
-                },
-              ],
-            },
-            {
-              title: "123",
-              key: '0-0-1',
-            },
-          ],
-        },
-      ],
+              "BLOCK_BIT_POSITION": 0,
+              "BFINAL": {
+                "bit_size": 1,
+                "value": 0,
+                "description": "last block marker = no"
+              }
+            }
+          ]
+        }
+      },
       loading: true
     };
 
@@ -67,7 +62,7 @@ class App extends Component<{}, State> {
             <HexEditor hexData={this.state.hex_data}></HexEditor>
           </div>
           <div className='App-frame'>
-            <JsonEditor json_data={this.state.json_data}></JsonEditor>
+            <JsonEditor json_data={this.state.json_obj}></JsonEditor>
           </div>
         </div>
       </>
@@ -83,42 +78,20 @@ class App extends Component<{}, State> {
         this.setState({hex_data: message.data.message});
         return;
       case COMMAND.jsonStringMessage:
-        this.setState({
-          json_data: this.convertJsonToTreeNode(JSON.parse(message.data.message)), 
-          loading: false
-        });
+        try {
+          let json_obj = JSON.parse(message.data.message)
+          this.setState({
+            json_obj: json_obj,
+            loading: false
+          })
+        }
+        catch (error) {
+          // TODO Send error to extension
+        }
         return;
     }
   }
 
-  convertJsonToTreeNode(json_object: {[key: string]: any}, index="0") {
-    let root: TreeDataNode[] = [];
-    let i = 0;
-    for(const key in json_object) {
-      if(typeof json_object[key] === 'string') {
-        root.push({
-          title: <span>"{key}" : <span style={{color: "rgb(203, 75, 22)"}}>"{json_object[key]}"</span></span>,
-          key: index + "-" + i.toString()
-        })
-      }
-      else if (typeof json_object[key] === 'number') {
-        root.push({
-          title: <span>"{key}" : <span style={{color: "rgb(38, 139, 210)"}}>{json_object[key]}</span></span>,
-          key: index + "-" + i.toString()
-        })
-      }
-      else if (typeof json_object[key] === 'object') {
-        let children = this.convertJsonToTreeNode(json_object[key], index + "-" + i.toString());
-        root.push({
-          title: <span>"{key}" :</span>,
-          key: index + "-" + i.toString(),
-          children: children
-        })
-      }
-      i++;
-    }
-    return root;
-  }
 }
 
 export default App;
