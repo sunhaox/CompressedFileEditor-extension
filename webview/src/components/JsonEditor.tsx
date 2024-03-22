@@ -6,7 +6,8 @@ import type { TreeDataNode } from 'antd';
 import { EventDataNode } from 'antd/es/tree';
 
 interface Props {
-  json_data: {}
+  json_data: {},
+  onChangeOffset: (offset: number, size: number) => void
 }
 
 interface State {
@@ -16,7 +17,8 @@ interface State {
 }
 
 class JsonEditor extends Component<Props, State> {
-  data_list = {};
+  bit_info = new Map();
+  bit_cnt = 0;
 
   constructor(props: Props) {
     super(props);
@@ -56,6 +58,7 @@ class JsonEditor extends Component<Props, State> {
     this.onExpand = this.onExpand.bind(this);
     this.onExpandAll = this.onExpandAll.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
+    this.onSelect = this.onSelect.bind(this);
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
@@ -78,11 +81,12 @@ class JsonEditor extends Component<Props, State> {
           virtual={true}
           showLine
           autoExpandParent={this.state.autoExpandParent}
-          expandAction='click'
+          expandAction='doubleClick'
           expandedKeys={this.state.expand_keys}
           switcherIcon={<DownOutlined />}
           treeData={this.state.tree_data}
           onExpand={this.onExpand}
+          onSelect={this.onSelect}
           />
         </div>
       </div>
@@ -128,6 +132,7 @@ class JsonEditor extends Component<Props, State> {
   }
 
   updateJsonData(json_data: {}) {
+    this.bit_cnt = 0;
     let rst = this.convertJsonToTreeNode(json_data);
     this.setState({tree_data: rst.nodes});
   }
@@ -136,6 +141,9 @@ class JsonEditor extends Component<Props, State> {
     let root: TreeDataNode[] = [];
     let keys: string[] = [];
     let i = 0;
+
+    let bit_size:number|undefined;
+
     for(const json_key in json_object) {
       let title_str = json_key;
       let title = <>{title_str}</>
@@ -175,20 +183,52 @@ class JsonEditor extends Component<Props, State> {
           children: rst.nodes
         })
         keys.push(...rst.keys);
+
+        if (rst.bit_size !== undefined)
+        {
+          this.bit_info.set(index + "-" + i.toString(), {bit_num: this.bit_cnt, bit_size: rst.bit_size});
+          this.bit_cnt += rst.bit_size;
+        }
+      }
+
+      if(json_key === "bit_size"){
+        bit_size = json_object[json_key];
       }
       i++;
     }
-    return {nodes: root, keys: keys};
+    return {nodes: root, keys: keys, bit_size: bit_size};
   }
 
   onSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { value } = e.target;
+    this.bit_cnt = 0;
     let rst = this.convertJsonToTreeNode(this.props.json_data, value)
     this.setState({
       tree_data: rst.nodes,
       expand_keys: rst.keys,
       autoExpandParent: true
     })
+  }
+
+  onSelect(selectedKeys: React.Key[], info: {
+    event: "select";
+    selected: boolean;
+    node: EventDataNode<TreeDataNode>;
+    selectedNodes: TreeDataNode[];
+    nativeEvent: MouseEvent;
+  }) {
+    console.log(`select key: ${selectedKeys}`);
+    if(this.bit_info.has(selectedKeys.toString())) {
+      let bit_info = this.bit_info.get(selectedKeys.toString());
+      console.log(`bit_num: ${bit_info.bit_num}; bit_size: ${bit_info.bit_size}`);
+      this.props.onChangeOffset(bit_info.bit_num, bit_info.bit_size);
+    }
+    else {
+      console.log('no info');
+      // clear the highlight setting.
+      this.props.onChangeOffset(0, 0);
+    }
+    
   }
 
 }
