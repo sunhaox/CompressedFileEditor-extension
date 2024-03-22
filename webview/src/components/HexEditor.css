@@ -29,3 +29,7 @@
 .HexEditor-body span:hover {
     background-color: #f3f9ff;
 }
+
+.HexEditor-highlight {
+    background-color: #ffffcc;
+}

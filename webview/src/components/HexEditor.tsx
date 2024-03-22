@@ -1,11 +1,28 @@
 import './HexEditor.css';
 import { Component } from 'react';
 
-interface State {
-  hexData: string[][];
+interface Props {
+  hexData: string[][],
+  offsetHighlight: number,
+  sizeByteHighlight: number
 }
 
-class HexEditor extends Component<State> {
+class HexEditor extends Component<Props> {
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {
+      offsetHighlight: 0,
+      sizeByteHighlight: 0
+    }
+  }
+
+  updateHighlightSetting(offset: number, size: number) {
+    this.setState({
+      offsetHighlight: offset,
+      sizeByteHighlight: size
+    })
+  }
 
   render() {
     return (
@@ -35,8 +52,11 @@ class HexEditor extends Component<State> {
             <div>
               <span className='HexEditor-col-header'>{(16 * index).toString(16).padStart(8, '0')}</span>
               {
-                hexArray.map(hex => (
-                  <span>{hex}</span>
+                hexArray.map((hex, i) => (
+                  ( (16*index+i)>=this.props.offsetHighlight && 
+                    (16*index+i) < this.props.offsetHighlight + this.props.sizeByteHighlight)?
+                    <span className='HexEditor-highlight'>{hex}</span>:
+                    <span>{hex}</span>
                   ))
               }
             </div>

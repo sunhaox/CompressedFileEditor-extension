@@ -6,12 +6,14 @@ import {
 } from './model/message.model';
 import HexEditor from './components/HexEditor'
 import JsonEditor from './components/JsonEditor';
-import { Spin } from 'antd';
+import { Spin, Input } from 'antd';
 
 interface State {
   hex_data: string[][],
   json_obj: {},
-  loading: boolean
+  loading: boolean,
+  highlightOffset: number,
+  highlightSize: number
 }
 
 class App extends Component<{}, State> {
@@ -41,10 +43,14 @@ class App extends Component<{}, State> {
           ]
         }
       },
-      loading: true
+      loading: true,
+      highlightOffset: 0,
+      highlightSize: 0
     };
 
     this.handleMessage = this.handleMessage.bind(this);
+    this.onchangeOffset = this.onchangeOffset.bind(this);
+    this.onchangeSize = this.onchangeSize.bind(this);
 
     window.addEventListener('message', this.handleMessage);
   }
@@ -59,14 +65,34 @@ class App extends Component<{}, State> {
           </div>
         <div className="App" style={{display: this.state.loading?"none":'flex'}}>
           <div className='App-frame'>
-            <HexEditor hexData={this.state.hex_data}></HexEditor>
+            <HexEditor hexData={this.state.hex_data} offsetHighlight={this.state.highlightOffset} sizeByteHighlight={this.state.highlightSize}></HexEditor>
           </div>
           <div className='App-frame'>
             <JsonEditor json_data={this.state.json_obj}></JsonEditor>
           </div>
         </div>
+        <Input onChange={this.onchangeOffset} />
+        <Input onChange={this.onchangeSize} />
       </>
     );
+  }
+
+  onchangeOffset(e: React.ChangeEvent<HTMLInputElement>) {
+    const { value } = e.target;
+    console.log(value);
+    const val = Number(value);
+    this.setState({
+      highlightOffset: val
+    });
+  }
+
+  onchangeSize(e: React.ChangeEvent<HTMLInputElement>) {
+    const {value} = e.target;
+    console.log(value);
+    const val = Number(value);
+    this.setState({
+      highlightSize: val
+    });
   }
 
   handleMessage(event: MessageEvent) {
