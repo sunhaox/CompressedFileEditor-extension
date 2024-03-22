@@ -138,7 +138,7 @@ class JsonEditor extends Component<Props, State> {
         const indexOf = title_str.indexOf(search_val);
         const beforeStr = title_str.substring(0, indexOf);
         const afterStr = title_str.slice(indexOf + search_val.length);
-        title = <>{beforeStr}<span style={{color: "#ff5500"}}>{search_val}</span>{afterStr}</>
+        title = <>{beforeStr}<span style={{backgroundColor: "#ffffcc"}}>{search_val}</span>{afterStr}</>
         keys.push(index + "-" + i.toString());
       }
       if(typeof json_object[json_key] === 'string') {
