@@ -11,7 +11,8 @@ interface Props {
 
 interface State {
   expand_keys: React.Key[],
-  tree_data: TreeDataNode[]
+  tree_data: TreeDataNode[],
+  autoExpandParent: boolean
 }
 
 class JsonEditor extends Component<Props, State> {
@@ -48,6 +49,7 @@ class JsonEditor extends Component<Props, State> {
           ],
         },
       ],
+      autoExpandParent: true
     }
 
     this.onCollapseAll = this.onCollapseAll.bind(this);
@@ -75,7 +77,7 @@ class JsonEditor extends Component<Props, State> {
           style={{fontFamily: "Consolas, 'Courier New', monospace", minWidth:"400px"}}
           virtual={true}
           showLine
-          autoExpandParent={true}
+          autoExpandParent={this.state.autoExpandParent}
           expandAction='click'
           expandedKeys={this.state.expand_keys}
           switcherIcon={<DownOutlined />}
@@ -97,7 +99,10 @@ class JsonEditor extends Component<Props, State> {
     expanded: boolean;
     nativeEvent: MouseEvent;
     }) {
-    this.setState({expand_keys: expandedKeys})
+    this.setState({
+      expand_keys: expandedKeys,
+      autoExpandParent: false
+    });
   }
 
   onExpandAll() {
@@ -172,7 +177,8 @@ class JsonEditor extends Component<Props, State> {
     let rst = this.convertJsonToTreeNode(this.props.json_data, value)
     this.setState({
       tree_data: rst.nodes,
-      expand_keys: rst.keys
+      expand_keys: rst.keys,
+      autoExpandParent: true
     })
   }
 
