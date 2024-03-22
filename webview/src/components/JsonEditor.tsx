@@ -153,10 +153,19 @@ class JsonEditor extends Component<Props, State> {
         })
       }
       else if (typeof json_object[json_key] === 'number') {
-        root.push({
-          title: <span>"{title}" : <span style={{color: "rgb(38, 139, 210)"}}>{json_object[json_key]}</span></span>,
-          key: index + "-" + i.toString()
-        })
+        if (json_key === "value")
+        {
+          root.push({
+            title: <span>"{title}" : <span style={{color: "rgb(38, 139, 210)"}}>{json_object[json_key]}</span> <span style={{color: "#aaaaaa"}}>0x{json_object[json_key].toString(16).padStart(2, '0')}</span></span>,
+            key: index + "-" + i.toString()
+          })
+        }
+        else {
+          root.push({
+            title: <span>"{title}" : <span style={{color: "rgb(38, 139, 210)"}}>{json_object[json_key]}</span></span>,
+            key: index + "-" + i.toString()
+          })
+        }
       }
       else if (typeof json_object[json_key] === 'object') {
         let rst = this.convertJsonToTreeNode(json_object[json_key], search_val, index + "-" + i.toString());
