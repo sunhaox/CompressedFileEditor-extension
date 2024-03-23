@@ -33,3 +33,11 @@
 .HexEditor-highlight {
     background-color: #ffffcc;
 }
+
+.HedEditor-popover {
+    position: absolute;
+    display: none;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #cccccc;
+}
