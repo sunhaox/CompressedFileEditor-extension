@@ -143,6 +143,8 @@ class JsonEditor extends Component<Props, State> {
     let i = 0;
 
     let bit_size:number|undefined;
+    let block_bit_begin: number|undefined;
+    let block_bit_size: number|undefined;
 
     for(const json_key in json_object) {
       let title_str = json_key;
@@ -203,7 +205,19 @@ class JsonEditor extends Component<Props, State> {
       if(json_key === "bit_size"){
         bit_size = json_object[json_key];
       }
+      else if (json_key === "BLOCK_BIT_POSITION") {
+        block_bit_begin = this.bit_cnt;
+      }
+      else if (json_key === "BLOCK_BIT_SIZE") {
+        block_bit_size = json_object[json_key];
+      }
+
       i++;
+    }
+
+    if(block_bit_begin && block_bit_size) {
+      this.bit_cnt = block_bit_begin;
+      bit_size = block_bit_size;
     }
     return {nodes: root, keys: keys, bit_size: bit_size};
   }
