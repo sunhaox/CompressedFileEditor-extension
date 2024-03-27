@@ -1,5 +1,5 @@
 import './HexEditor.css';
-import { Component } from 'react';
+import React, { Component } from 'react';
 
 interface Props {
   hexData: string[][],
@@ -15,6 +15,8 @@ interface State {
 }
 
 class HexEditor extends Component<Props, State> {
+  private myRef: React.RefObject<HTMLDivElement>;
+
   constructor(props: Props) {
     super(props);
 
@@ -27,9 +29,27 @@ class HexEditor extends Component<Props, State> {
 
     this.onMouseEnter = this.onMouseEnter.bind(this);
     this.onMouseLeave = this.onMouseLeave.bind(this);
+
+    this.myRef = React.createRef<HTMLDivElement>();
+  }
+
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+      if (prevProps.offsetHighlight !== this.props.offsetHighlight) {
+        this.scrollToAnchor();
+      }
+  }
+
+  scrollToAnchor() {
+    const anchor = document.getElementById('HexEditor-anchor');
+    const newTop = anchor?.offsetTop;
+    if (this.myRef && this.myRef.current && newTop) {
+      this.myRef.current.scrollTo(0, newTop-20);
+      console.log(`scroll: ${newTop}`);
+    }
   }
 
   render() {
+    var flag = 0;
     return (
       <div className='HexEditor'>
         <div className='HexEditor-header'>
@@ -51,7 +71,7 @@ class HexEditor extends Component<Props, State> {
           <span>0E</span>
           <span>0F</span>
         </div>
-        <div className='HexEditor-body'>
+        <div className='HexEditor-body' ref={this.myRef}>
         {
           this.props.hexData.map((hexArray, index) => (
             <div>
@@ -60,7 +80,11 @@ class HexEditor extends Component<Props, State> {
                 hexArray.map((hex, i) => (
                   ( (16*index+i)>=this.props.offsetHighlight && 
                     (16*index+i) < this.props.offsetHighlight + this.props.sizeByteHighlight)?
-                    <span className='HexEditor-highlight' onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>{hex}</span>:
+                    ( 
+                      !flag++?
+                      <span className='HexEditor-highlight' id='HexEditor-anchor' onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>{hex}</span>:
+                      <span className='HexEditor-highlight' onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>{hex}</span>
+                    ):
                     <span onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>{hex}</span>
                   ))
               }
