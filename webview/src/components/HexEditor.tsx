@@ -16,6 +16,7 @@ interface State {
 
 class HexEditor extends Component<Props, State> {
   private myRef: React.RefObject<HTMLDivElement>;
+  private timer: NodeJS.Timeout|undefined;
 
   constructor(props: Props) {
     super(props);
@@ -111,18 +112,21 @@ class HexEditor extends Component<Props, State> {
     const top = pos.top;
     const bin_str = parseInt(value, 16).toString(2).padStart(8, '0').replace(/(.{4})/g, '$1 ')
     console.log(`enter: ${value}`);
-    this.setState({
-      popover_display: 'block',
-      popover_left: left,
-      popover_top: top-45,
-      popover_str: bin_str
-    })
+    this.timer = setTimeout(() => {
+      this.setState({
+        popover_display: 'block',
+        popover_left: left,
+        popover_top: top-45,
+        popover_str: bin_str
+      })
+    }, 500);
+    
   }
 
   onMouseLeave(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    const element = event.currentTarget;
-    const value = element.innerText;
-    console.log(`leave: ${value}`);
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
     this.setState({
       popover_display: 'none'
     })
