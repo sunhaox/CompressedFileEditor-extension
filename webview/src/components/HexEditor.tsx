@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 interface Props {
   hexData: string[][],
   offsetHighlight: number,
-  sizeByteHighlight: number
+  sizeBitHighlight: number
 }
 
 interface State {
@@ -79,15 +79,15 @@ class HexEditor extends Component<Props, State> {
               <span className='HexEditor-col-header'>{(16 * index).toString(16).padStart(8, '0')}</span>
               {
                 hexArray.map((hex, i) => (
-                  ( (16*index+i)>=this.props.offsetHighlight && 
-                    (16*index+i) < this.props.offsetHighlight + this.props.sizeByteHighlight)?
+                  ( (16*index+i) >= Math.floor(this.props.offsetHighlight / 8) && 
+                    (16*index+i) < Math.ceil((this.props.offsetHighlight + this.props.sizeBitHighlight) / 8))?
                     ( 
                       !flag++?
                       <span className='HexEditor-highlight' id='HexEditor-anchor' onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>{hex}</span>:
                       <span className='HexEditor-highlight' onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>{hex}</span>
                     ):
                     <span onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>{hex}</span>
-                  ))
+                ))
               }
             </div>
           ))

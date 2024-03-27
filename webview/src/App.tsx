@@ -64,7 +64,7 @@ class App extends Component<{}, State> {
           </div>
         <div className="App" style={{display: this.state.loading?"none":'flex'}}>
           <div className='App-frame'>
-            <HexEditor hexData={this.state.hex_data} offsetHighlight={this.state.highlightOffset} sizeByteHighlight={this.state.highlightSize}></HexEditor>
+            <HexEditor hexData={this.state.hex_data} offsetHighlight={this.state.highlightOffset} sizeBitHighlight={this.state.highlightSize}></HexEditor>
           </div>
           <div className='App-frame'>
             <JsonEditor json_data={this.state.json_obj} onChangeOffset={this.onChangeHexOffset}></JsonEditor>
@@ -76,8 +76,8 @@ class App extends Component<{}, State> {
 
   onChangeHexOffset(offset: number, size: number) {
     this.setState({
-      highlightOffset: Math.floor(offset/8),
-      highlightSize: Math.ceil(size/8)
+      highlightOffset: offset,
+      highlightSize: size
     })
   }
 
