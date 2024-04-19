@@ -6,6 +6,7 @@
   "engines": {
     "vscode": "^1.87.0"
   },
+  "publisher": "sunhx",
   "categories": [
     "Other"
   ],
@@ -46,7 +47,8 @@
     "install_all": "npm install && npm run install_webview",
     "build_webview": "cd webview && npm run build",
     "build_all": "npm run compile && npm run build_webview",
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run build_all",
+    "build": "npm run build_all",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
