@@ -29,12 +29,22 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('compressed-file-editor.openFile', async () => {
 
 		const editor = vscode.window.activeTextEditor;
+		var filePath;
 		if(!editor) {
-			vscode.window.showInformationMessage('No opened file.');
-			return;
+			let path = await vscode.window.showOpenDialog({
+				canSelectFiles:true,       // open file?
+				canSelectFolders: false,   // open folders?
+				canSelectMany: false       // open multi files?
+			});
+			filePath = path?.[0].fsPath;
+			if(!filePath) {
+				vscode.window.showInformationMessage('No file selected.');
+				return;
+			}
 		}
-
-		const filePath = editor.document.uri.fsPath;
+		else {
+			filePath = editor.document.uri.fsPath;
+		}
 		
 		_panel = createWebview(context);
 
