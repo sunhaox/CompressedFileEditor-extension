@@ -40,6 +40,11 @@
         {
           "command": "compressed-file-editor.openFile"
         }
+      ],
+      "explorer/context": [
+        {
+          "command": "compressed-file-editor.openFile"
+        }
       ]
     }
   },
