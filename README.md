@@ -6,13 +6,13 @@ Compressed File Editor is a Visual Studio Code extension to display and analyze 
 
 ## Features
 
-### Analyze Compressed File
+* Analyze Compressed File
 Generate a JSON file for selected compressed file including all decode filed.  
 
-### Show Compressed File as Hex
+* Show Compressed File as Hex
 Open and show the selected file as hex.
 
-### JSON tree
+* JSON tree
 Show JSON file as a JSON tree. Clicking the specific JSON item will highlight the corresponding hexadecimal number.  
 
 ## How to Use

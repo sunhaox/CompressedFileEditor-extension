@@ -5,6 +5,10 @@ import * as fs from 'fs';
 import { getUri } from './utils/getUri';
 import { getNonce } from './utils/getNonce';
 import { getFileUri } from './utils/getFileUri';
+import { isWin } from './utils/isWin';
+import { getFileExtension } from './utils/getFileExtension';
+import path = require('path');
+import { execSync } from 'child_process';
 import {
 	COMMAND, 
 	Message,
@@ -12,6 +16,7 @@ import {
 	MessageHexString,
 	MessageJsonString
 } from "./model/message.model";
+
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -26,28 +31,81 @@ export function activate(context: vscode.ExtensionContext) {
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	context.subscriptions.push(vscode.commands.registerCommand('compressed-file-editor.openFile', async () => {
-
-		const editor = vscode.window.activeTextEditor;
+	context.subscriptions.push(vscode.commands.registerCommand('compressed-file-editor.openFile', async (fileUri) => {
+		// Get the input compressed file path.
 		var filePath;
-		if(!editor) {
-			let path = await vscode.window.showOpenDialog({
-				canSelectFiles:true,       // open file?
-				canSelectFolders: false,   // open folders?
-				canSelectMany: false       // open multi files?
-			});
-			filePath = path?.[0].fsPath;
-			if(!filePath) {
-				vscode.window.showInformationMessage('No file selected.');
-				return;
+		if (typeof fileUri === 'undefined' || !(fileUri instanceof vscode.Uri)) {
+			const editor = vscode.window.activeTextEditor;
+			if(!editor) {
+				let path = await vscode.window.showOpenDialog({
+					canSelectFiles:true,       // open file?
+					canSelectFolders: false,   // open folders?
+					canSelectMany: false       // open multi files?
+				});
+				filePath = path?.[0].fsPath;
+				if(!filePath) {
+					vscode.window.showInformationMessage('No file selected.');
+					return;
+				}
+			}
+			else {
+				filePath = editor.document.uri.fsPath;
 			}
 		}
 		else {
-			filePath = editor.document.uri.fsPath;
+			filePath = fileUri.fsPath;
+		}
+
+		// Genrate the JSON file if needed.
+		if (vscode.workspace.getConfiguration().get('compressed-file-editor.generateJsonFile')) {
+			let execString = "";
+			const fileExtension = getFileExtension(filePath);
+			switch(fileExtension) {
+				case "gz":   execString = "gzip_dump"; break;
+				case "zlib": execString = "zlib_dump"; break;
+				case "lz4":  execString = "lz4_dump";  break;
+				case "zst":  execString = "zstd_dump"; break;
+			}
+
+			if (execString === "") {
+				const chooseItems = ["gzip", "zlib", "lz4", "zstd", "deflate"];
+				let choose = await vscode.window.showQuickPick(chooseItems, {
+					canPickMany: false,
+					ignoreFocusOut: true,
+					matchOnDescription: true,
+					matchOnDetail: true,
+					placeHolder: `Choose the compressed file algorithm:`
+				});
+
+				if (!choose) {
+					return;
+				}
+
+				execString = choose + '_dump';
+			}
+			
+			if (isWin()) {
+				execString += ".exe";
+				execString = path.join(context.extensionPath, "bin", "windows", execString);
+			}
+			else {
+				execString = path.join(context.extensionPath, "bin", "linux", execString);
+			}
+
+			execString += ` "${filePath}"`;
+			
+			try {
+				const rst = execSync(execString).toString();
+			}
+			catch (error) {
+				vscode.window.showErrorMessage(`${error}`);
+			}
 		}
 		
+		// Create the webview.
 		_panel = createWebview(context);
 
+		// Read the compressed file.
 		const hexString = (await openFile(filePath)).toString('hex');
 
 		if(hexString === undefined){
@@ -78,6 +136,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		_panel.webview.postMessage(hexMessage);
 
+		// Read the JSON file.
 		const jsonString = await openJson(filePath);
 
 		if(jsonString === undefined) {
