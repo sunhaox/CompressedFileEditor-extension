@@ -1,19 +1,20 @@
 import './JsonEditor.css';
 import { DownOutlined } from '@ant-design/icons';
 import { Component } from 'react';
-import { Tree, Input} from 'antd';
+import { Tree, Input, Alert} from 'antd';
 import type { TreeDataNode } from 'antd';
 import { EventDataNode } from 'antd/es/tree';
 
 interface Props {
-  json_data: {},
+  json_data: {}|undefined,
   onChangeOffset: (offset: number, size: number) => void
 }
 
 interface State {
   expand_keys: React.Key[],
   tree_data: TreeDataNode[],
-  autoExpandParent: boolean
+  autoExpandParent: boolean,
+  jsonDisplay: boolean
 }
 
 class JsonEditor extends Component<Props, State> {
@@ -51,7 +52,8 @@ class JsonEditor extends Component<Props, State> {
           ],
         },
       ],
-      autoExpandParent: true
+      autoExpandParent: true,
+      jsonDisplay: true
     }
 
     this.onCollapseAll = this.onCollapseAll.bind(this);
@@ -69,27 +71,31 @@ class JsonEditor extends Component<Props, State> {
 
   render() {
     return (
-      <div className='JsonEditor'>
-        <div className='JsonEditor-header'>
-          <Input size='small' placeholder="Search" onChange={this.onSearchChange} />
-          <div className='codicon codicon-collapse-all' onClick={this.onCollapseAll}></div>
-          <div className='codicon codicon-expand-all' onClick={this.onExpandAll}></div>
+      <>
+        <div className='JsonEditor' style={{display: this.state.jsonDisplay?"block":"none"}}>
+          <div className='JsonEditor-header'>
+            <Input size='small' placeholder="Search" onChange={this.onSearchChange} />
+            <div className='codicon codicon-collapse-all' onClick={this.onCollapseAll}></div>
+            <div className='codicon codicon-expand-all' onClick={this.onExpandAll}></div>
+          </div>
+          <div className='JsonEditor-body'>
+            <Tree
+            style={{fontFamily: "Consolas, 'Courier New', monospace", minWidth:"400px"}}
+            virtual={true}
+            showLine
+            autoExpandParent={this.state.autoExpandParent}
+            expandAction='doubleClick'
+            expandedKeys={this.state.expand_keys}
+            switcherIcon={<DownOutlined />}
+            treeData={this.state.tree_data}
+            onExpand={this.onExpand}
+            onSelect={this.onSelect}
+            />
+            
+          </div>
         </div>
-        <div className='JsonEditor-body'>
-          <Tree
-          style={{fontFamily: "Consolas, 'Courier New', monospace", minWidth:"400px"}}
-          virtual={true}
-          showLine
-          autoExpandParent={this.state.autoExpandParent}
-          expandAction='doubleClick'
-          expandedKeys={this.state.expand_keys}
-          switcherIcon={<DownOutlined />}
-          treeData={this.state.tree_data}
-          onExpand={this.onExpand}
-          onSelect={this.onSelect}
-          />
-        </div>
-      </div>
+        <Alert message="JSON Error" description="The JSON file is not created or it can not be translated to standard JSON object." type="error" style={{display:this.state.jsonDisplay?"none":"block"}} />
+      </>
     );
   }
 
@@ -131,10 +137,17 @@ class JsonEditor extends Component<Props, State> {
 
   }
 
-  updateJsonData(json_data: {}) {
+  updateJsonData(json_data: {}|undefined) {
+    if (json_data === undefined) {
+      this.setState({jsonDisplay: false});
+      return;
+    }
     this.bit_cnt = 0;
     let rst = this.convertJsonToTreeNode(json_data);
-    this.setState({tree_data: rst.nodes});
+    this.setState({
+      tree_data: rst.nodes,
+      jsonDisplay: true
+    });
   }
 
   convertJsonToTreeNode(json_object: {[key: string]: any}, search_val="", index="0") {
@@ -223,6 +236,9 @@ class JsonEditor extends Component<Props, State> {
   }
 
   onSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (this.props.json_data === undefined) {
+      return;
+    }
     const { value } = e.target;
     this.bit_cnt = 0;
     let rst = this.convertJsonToTreeNode(this.props.json_data, value)

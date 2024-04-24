@@ -38,6 +38,6 @@ export type MessageHexString = Message & {
 export type MessageJsonString = Message & {
   command: COMMAND.jsonStringMessage;
   data: {
-    message: string;
+    message: string|undefined;
   }
 };

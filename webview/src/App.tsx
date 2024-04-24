@@ -10,7 +10,7 @@ import { Spin } from 'antd';
 
 interface State {
   hex_data: string[][],
-  json_obj: {},
+  json_obj: {}|undefined,
   loading: boolean,
   highlightOffset: number,
   highlightSize: number
@@ -98,7 +98,10 @@ class App extends Component<{}, State> {
           })
         }
         catch (error) {
-          // TODO Send error to extension
+          this.setState({
+            json_obj: undefined,
+            loading: false
+          })
         }
         return;
     }

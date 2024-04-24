@@ -139,10 +139,6 @@ export function activate(context: vscode.ExtensionContext) {
 		// Read the JSON file.
 		const jsonString = await openJson(filePath);
 
-		if(jsonString === undefined) {
-			return;
-		} 
-
 		const jsonMessage: MessageJsonString = {
 			command: COMMAND.jsonStringMessage,
 			data: {
