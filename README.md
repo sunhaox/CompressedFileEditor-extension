@@ -20,7 +20,7 @@ Open a compressed file and click the Compressed File Editor icon in the navigati
 
 ## Extension Settings
 
-None.
+* `compressed-file-editor.generateJsonFile`: Generate JSON file by decoding the compressed file.  
 
 ## Known Issues
 

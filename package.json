@@ -2,7 +2,7 @@
   "name": "compressed-file-editor",
   "displayName": "Compressed File Editor",
   "description": "",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.87.0"
   },
@@ -13,6 +13,11 @@
   "activationEvents": [],
   "icon": "media/icon.png",
   "main": "./out/extension.js",
+  "license":"MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sunhaox/CompressedFileEditor"
+  },
   "contributes": {
     "configuration": [
       {
