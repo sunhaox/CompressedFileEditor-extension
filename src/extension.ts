@@ -150,16 +150,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('compressed-file-editor.sendMessage', () => {
-		const messageFromExtension: MessageFromExtension = {
-			command: COMMAND.testMessageFromExtension,
-			data: {
-				message: "Message From Extension"
-			}
-		};
-		_panel?.webview.postMessage(messageFromExtension);
-	}));
-
 }
 
 // This method is called when your extension is deactivated
