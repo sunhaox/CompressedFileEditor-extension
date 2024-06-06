@@ -2,7 +2,7 @@
 
 Compressed File Editor is a Visual Studio Code extension to display and analyze the compressed file, like gzip, zlib, etc.
 
-![Recording of Compressed File Editor](https://github.com/sunhaox/CompressedFileEditor/raw/main/resources/demo.gif)
+![Recording of Compressed File Editor](https://github.com/sunhaox/CompressedFileEditor-extension/raw/main/resources/demo.gif)
 
 ## Features
 
